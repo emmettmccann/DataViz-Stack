@@ -2,13 +2,13 @@
 
 **by Emmett McCann**
 
-[**"Stack"**](https://emmettmccann.github.io/01-ghd3/) explores the names of everyone in this class, progressively generating a histogram of letters used in each student's first name. 
+[**"Stack"**](https://emmettmccann.github.io/DataViz-Stack/) explores the names of everyone in this class, progressively generating a histogram of letters used in each student's first name. 
 
 Upon loading, Stack selects a random name from the class and breaks it down into letters, then passing these to a histogram. Once these letters are in their correct places in the histogram, Stack selects a new name and repeats the process. Over time, this builds out a histogram of letters in the first names of everyone in the class.
 
 While it is not interactive, there are a few easy ways to change how this visualization displays. First, the width of the window directly affects the size of the graph. I have found that a vertically oriented window works best. A window that is just under twice as tall as it is wide seems to have the best results. Second, the speed of the visualization is currently set to best show its animations. In order to speed this viz up so that you can get to a completed histogram faster, increase the speed variable in the source code. 1 or 2 are good for viewing the animations, anywhere between 10 and 15 is better for viewing the results.
 
-View viz [here.](https://emmettmccann.github.io/01-ghd3/)
+View viz [here.](https://emmettmccann.github.io/DataViz-Stack/)
 
 
 ### Resources
