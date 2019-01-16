@@ -1,0 +1,324 @@
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
+<style>
+	*,
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+	}
+
+	polygon {
+		background-color: #907ad6;
+		stroke: transparent;
+		fill: #907ad6;
+	}
+
+	circle {
+		background-color: #907ad6;
+		fill: #907ad6;
+		stroke: transparent;
+	}
+
+	.chart {
+		background-color: #282828;
+		text-align: right;
+		width: 100%;
+		height: 70%;
+		float: right;
+	}
+
+	.staging {
+		background-color: #f4f7f5;
+		text-align: right;
+		width: 100%;
+		height: 30%;
+		float: left;
+	}
+
+	.centered {
+		margin: auto;
+		background-color: black;
+	}
+
+	.chart rect {
+		font: 10px sans-serif;
+		background-color: #77878b;
+		text-align: center;
+		padding: 0px;
+		margin: 3px;
+	}
+</style>
+
+<svg class="staging"></svg> <svg class="chart"></svg>
+
+<script type="text/javascript">
+	console.log(d3); // test if d3 is loaded
+
+	var lavender = d3.rgb('#dabfff'),
+		pastel = d3.rgb('#907ad6'),
+		purple = d3.rgb('#4f518c');
+
+	var black = d3.rgb('#282828'),
+		gray = d3.rgb('#77878b'),
+		white = d3.rgb('#f4f7f5');
+
+	var currentNameIndex = 0;
+
+	var speed = 1;
+
+	var nameString =
+		'fname,lname\nAkash,Shaji\nAlex,Spielman\nAlexander,Wurts\nAmanda,Moulaison\nAmanda,Pennie\nAndrew,Hand\nAndrew,Ressler\nAnthony,Gringeri\nCaleb,Ralphs\nCamelia,Brumar\nDan,McKay\nDaniel,McDonough\nDemi,Karavoussianis\nEmmett,McCann\nEric,Moo\nEric,Peterson\nFabio,Borges\nFrank,Campanelli\nHaofan,Zhang\nHarsh,Rana\nHaylea,Northcott\nJack,Charbonneau\nJacob,Kaplan\nJacob,Komissar\nJerry,Assan\nJimmy,Tran\nJohn,Bieber\nJohn,Dyer\nJoseph,Caltabiano\nJosh,Desmond\nJoshua,Galang\nJulian,Pinzer\nKaritta,Zellerbach\nKarsten,Roberts\nKien,Nhan\nKylie,Dickinson\nLane,Harrison\nLocke,Bonomo\nLogan,Romero\nLuisa,Perez\nMadeline,Burke\nMatt,Fortmeyer\nMeghana,Bhatia\nMexintong,Zha\nMichael,Krebs\nNathaniel,Dennler\nNicholas,Hollan\nRobert,Dutile\nRyan,Vereque\nStephen,Andrews\nSurya,Vadivazhagu\nSydney,Fisher\nSynella,Gonzales\nTarek,Safa\nTheodore,Bieber\nThomas,Gibbia\nThomas,Schweich\nThomas,Wiles\nXinzhe,Jiang\nYihan,Lin\nYuanda,Song';
+
+	var alphabet = [
+		{ name: 'A', count: 0, x: 0 },
+		{ name: 'B', count: 0, x: 0 },
+		{ name: 'C', count: 0, x: 0 },
+		{ name: 'D', count: 0, x: 0 },
+		{ name: 'E', count: 0, x: 0 },
+		{ name: 'F', count: 0, x: 0 },
+		{ name: 'G', count: 0, x: 0 },
+		{ name: 'H', count: 0, x: 0 },
+		{ name: 'I', count: 0, x: 0 },
+		{ name: 'J', count: 0, x: 0 },
+		{ name: 'K', count: 0, x: 0 },
+		{ name: 'L', count: 0, x: 0 },
+		{ name: 'M', count: 0, x: 0 },
+		{ name: 'N', count: 0, x: 0 },
+		{ name: 'O', count: 0, x: 0 },
+		{ name: 'P', count: 0, x: 0 },
+		{ name: 'Q', count: 0, x: 0 },
+		{ name: 'R', count: 0, x: 0 },
+		{ name: 'S', count: 0, x: 0 },
+		{ name: 'T', count: 0, x: 0 },
+		{ name: 'U', count: 0, x: 0 },
+		{ name: 'V', count: 0, x: 0 },
+		{ name: 'W', count: 0, x: 0 },
+		{ name: 'X', count: 0, x: 0 },
+		{ name: 'Y', count: 0, x: 0 },
+		{ name: 'Z', count: 0, x: 0 },
+	];
+
+	var letterWidth = Math.floor(window.innerWidth / 26);
+
+	var chart = d3.select('.chart');
+	var staging = d3.select('.staging');
+	var body = d3.select('body').style('background-color', black);
+
+	var radius = letterWidth / 2;
+	var x = 0;
+	var gH = window.innerHeight * 0.7;
+
+	var nameFontSize = 50;
+
+	var nameArray = convertToObjects(nameString);
+
+	function s(num) {
+		return num / speed;
+	}
+	function convertToObjects(str) {
+		str = str.toUpperCase();
+		var array = str.split('\n');
+		var head = array[0].split(',');
+		var objArray = [];
+
+		for (var i = 1; i < array.length; i++) {
+			var data = array[i].split(',');
+			var obj = {};
+			for (var j = 0; j < data.length; j++) {
+				obj[head[j]] = data[j];
+			}
+			obj['index'] = i - 1;
+			objArray.push(obj);
+		}
+		return objArray;
+	}
+
+	nameArray = d3.shuffle(nameArray);
+
+	for (var i = 0; i < alphabet.length; i++) {
+		alphabet[i].x = i * letterWidth;
+	}
+
+	chart
+		.selectAll('line')
+		.data(alphabet)
+		.enter()
+		.append('line')
+		.attr('x1', d => d.x)
+		.attr('y1', 0)
+		.attr('x2', d => d.x)
+		.attr('y2', window.innerHeight)
+		.attr("stroke-width", 0.5)
+		.attr("stroke", gray);
+
+	function displayName(name) {
+		name = name.split('');
+		var length = name.length;
+		var nameWidth = length * nameFontSize;
+
+		var letters = staging
+			.selectAll('g')
+			.data(name)
+			.enter()
+			.append('g')
+			.attr('transform', function(d, i) {
+				return (
+					'translate(' +
+					(window.innerWidth / 2 - nameWidth / 2 + i * nameFontSize) +
+					', ' +
+					(window.innerHeight * 0.15 - nameFontSize / 2) +
+					')'
+				);
+			});
+
+		letters
+			.append('rect')
+			.attr('fill', pastel)
+			.attr('width', nameFontSize)
+			.attr('height', nameFontSize);
+
+		letters
+			.append('text')
+			.text(d => d)
+			.attr('font-size', nameFontSize)
+			.attr('fill', lavender)
+			.attr('dy', nameFontSize / 2)
+			.attr('dx', nameFontSize / 2)
+			.attr('text-anchor', 'middle')
+			.attr('alignment-baseline', 'central');
+
+		letters.sort(function(a, b) {
+			return a - b;
+		});
+
+		return letters.nodes();
+	}
+
+	function placeLetter(letter) {
+		letter
+			.transition()
+			.duration(s(1000))
+			.attr('transform', function(d, i) {
+				return (
+					'translate(' +
+					alphabet.filter(obj => {
+						return obj.name === d;
+					})[0].x +
+					', ' +
+					(window.innerHeight * 0.3 - letterWidth) +
+					')'
+				);
+			})
+			.on('end', function() {
+				var c = d3.select(this);
+				var cLetter = alphabet.filter(obj => {
+					return obj.name === c.datum();
+				})[0];
+				dropCircle(cLetter.x + letterWidth / 2, window.innerHeight * 0.7 - letterWidth * cLetter.count);
+				cLetter.count++;
+				c.transition()
+					.duration(s(100))
+					.delay(s(300))
+					.attr('transform', function(d, i) {
+						return 'translate(' + cLetter.x + ', ' + window.innerHeight * 0.3 + ')';
+					});
+			});
+
+		letter
+			.select('text')
+			.transition()
+			.duration(s(600))
+			.attr('font-size', 0)
+			.remove();
+		letter
+			.select('rect')
+			.transition()
+			.duration(s(1000))
+			.attr('rx', letterWidth / 2)
+			.attr('ry', letterWidth / 2)
+			.attr('height', letterWidth)
+			.attr('width', letterWidth);
+	}
+
+	function show(nameString) {
+		var nameLetters = displayName(nameString);
+		var i = 0;
+		var t = d3.interval(function() {
+			if (i > nameLetters.length) {
+				nextName();
+				t.stop();
+			}
+			placeLetter(d3.select(nameLetters[i]));
+			i++;
+		}, s(1000));
+	}
+
+	function nextName() {
+		currentNameIndex++;
+		if (currentNameIndex == nameArray.length) {
+			//currentNameIndex = 0;
+		} else {
+			d3.selectAll('.staging g').remove();
+			show(nameArray[currentNameIndex].FNAME);
+		}
+	}
+
+	nextName();
+
+	function land(circle, y) {
+		//Given y is for the bottom of the circle, convert this to center of circle
+		//Below are the goal coordinates of the object
+		var r = parseInt(circle.attr('r'));
+		y = parseInt(parseInt(y) - r);
+		var x = parseInt(circle.attr('cx'));
+
+		var xl = x - r,
+			xr = x + r + 1,
+			yu = y - r,
+			yd = y + r + 1;
+
+		circle
+			.transition()
+			.ease(d3.easeCubicIn)
+			.duration(s(1000))
+			.attr('cy', y)
+			.transition()
+			.duration(s(1000))
+			.ease(d3.easeCubicOut)
+			.attr('cy', y + r / 3)
+			.remove();
+
+		var keyframes = [
+			'' + x + ',' + y + ' ' + x + ',' + y + ' ' + x + ',' + y + ' ' + x + ',' + y,
+			'' + x + ',' + yd + ' ' + xl + ',' + y + ' ' + xr + ',' + y + ' ' + x + ',' + yd,
+			'' + xl + ',' + yd + ' ' + xl + ',' + y + ' ' + xr + ',' + y + ' ' + xr + ',' + yd,
+			'' + xl + ',' + yd + ' ' + xl + ',' + yu + ' ' + xr + ',' + yu + ' ' + xr + ',' + yd,
+		];
+
+		chart
+			.append('polygon')
+			.attr('points', keyframes[0])
+			.transition()
+			.duration(s(0))
+			.delay(s(1000))
+			.attr('points', keyframes[1])
+			.transition()
+			.ease(d3.easeLinear)
+			.duration(s(100))
+			.attr('points', keyframes[2])
+			.transition()
+			.ease(d3.easeCubicOut)
+			.duration(s(300))
+			.attr('points', keyframes[3]);
+	}
+
+	function dropCircle(cx, groundHeight) {
+		var target = chart
+			.append('circle')
+			.attr('r', radius)
+			.attr('cx', cx)
+			.attr('cy', -letterWidth);
+		land(target, groundHeight);
+	}
+</script>
